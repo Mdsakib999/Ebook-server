@@ -1,12 +1,13 @@
 import bcrypt from "bcrypt";
 import User from "../models/user.model.js";
+import crypto from "crypto";
 
 const registerUser = async (req, res) => {
     try {
-        const { name, email, password, phone, address } = req.body;
+        const { name, email, password } = req.body;
 
-        if (!name || !email || !password || !phone || !address) {
-            return res.status(400).json({ message: "All fields are required" });
+        if (!name || !email) {
+            return res.status(400).json({ message: "Name and email are required" });
         }
 
         const existingUser = await User.findOne({ email });
@@ -14,14 +15,13 @@ const registerUser = async (req, res) => {
             return res.status(400).json({ message: "Email already exists" });
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const finalPassword = password || crypto.randomBytes(20).toString("hex");
+        const hashedPassword = await bcrypt.hash(finalPassword, 10);
 
         const newUser = new User({
             name,
             email,
             password: hashedPassword,
-            phone,
-            address,
         });
 
         const savedUser = await newUser.save();

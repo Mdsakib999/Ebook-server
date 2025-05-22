@@ -1,55 +1,39 @@
-import bcrypt from "bcrypt";
 import User from "../models/user.model.js";
 
 const registerUser = async (req, res) => {
     try {
-        const { name, email } = req.body;
+        const { name, email, provider, uid } = req.body;
 
-        if (!name || !email) {
+        if (!name || !email || !provider || !uid) {
             return res.status(400).json({ message: "All fields are required" });
         }
 
         const existingUser = await User.findOne({ email });
-        if (existingUser) {
+
+        // 🔹 Google Sign-In: If user exists, return it (no need to save again)
+        if (provider === "google.com") {
+            if (existingUser) {
+                return res.status(200).json(existingUser);
+            }
+        }
+
+        // 🔹 Email/Password: If user exists, return error
+        if (provider === "password" && existingUser) {
             return res.status(400).json({ message: "Email already exists" });
         }
 
+        // ✅ Save new user
         const newUser = new User({
             name,
             email,
+            provider,
+            uid,
         });
 
         const savedUser = await newUser.save();
-        if (!savedUser) {
-            return res.status(500).json({ message: "Failed to register user" });
-        }
+
         return res.status(201).json(savedUser);
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Something went wrong" });
-    }
-};
 
-const loginUser = async (req, res) => {
-    try {
-        const { email, password } = req.body;
-
-        if (!email || !password) {
-            return res.status(400).json({ message: "All fields are required" });
-        }
-
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(400).json({ message: "Invalid credentials" });
-        }
-
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(400).json({ message: "Invalid credentials" });
-        }
-
-        const { password: _, ...userWithoutPassword } = user._doc;
-        return res.status(200).json(userWithoutPassword);
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: "Something went wrong" });
@@ -80,17 +64,13 @@ const getUser = async (req, res) => {
 const updateUser = async (req, res) => {
     try {
         const userId = req.params.id;
-        let { name, email, phone, address, password } = req.body;
+        let { name, email } = req.body;
 
         if (!userId) {
             return res.status(400).json({ message: "User ID is required" });
         }
 
-        const updateData = { name, email, phone, address };
-
-        if (password) {
-            updateData.password = await bcrypt.hash(password, 10);
-        }
+        const updateData = { name, email };
 
         const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });
         if (!updatedUser) {
@@ -137,7 +117,6 @@ const getAllUsers = async (req, res) => {
 
 export {
     registerUser,
-    loginUser,
     getUser,
     updateUser,
     deleteUser,

@@ -10,6 +10,14 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
+    provider: {
+        type: String,
+        required: true,
+    },
+    uid: {
+        type: String,
+        required: true,
+    },
     role: {
         type: String,
         enum: ["user", "admin"],

@@ -1,4 +1,5 @@
 import express from 'express';
+import { uploadMultiple } from "../config/multer.js";
 import {
     addBook,
     getAllBooks,
@@ -10,9 +11,13 @@ import {
 const bookRoute = express.Router();
 
 bookRoute.get('/allbooks', getAllBooks)
+
 bookRoute.get('/:id', getBookById)
-bookRoute.post('/add-books', addBook)
-bookRoute.put('/:id', updateBook)
+
+bookRoute.post('/add-books', uploadMultiple, addBook);
+
+bookRoute.put('/:id', uploadMultiple, updateBook);
+
 bookRoute.delete('/:id', deleteBook)
 
 export default bookRoute;

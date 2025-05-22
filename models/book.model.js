@@ -9,7 +9,7 @@ const bookSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    shortDescription: {
+    description: {
         type: String,
         required: true
     },
@@ -41,7 +41,7 @@ const bookSchema = new mongoose.Schema({
         type: String,
         required: true
     }
-})
+}, { timestamps: true })
 
 const Book = mongoose.model("Book", bookSchema)
 

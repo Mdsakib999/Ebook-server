@@ -1,13 +1,12 @@
 import bcrypt from "bcrypt";
 import User from "../models/user.model.js";
-import crypto from "crypto";
 
 const registerUser = async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { name, email } = req.body;
 
         if (!name || !email) {
-            return res.status(400).json({ message: "Name and email are required" });
+            return res.status(400).json({ message: "All fields are required" });
         }
 
         const existingUser = await User.findOne({ email });
@@ -15,19 +14,16 @@ const registerUser = async (req, res) => {
             return res.status(400).json({ message: "Email already exists" });
         }
 
-        const finalPassword = password || crypto.randomBytes(20).toString("hex");
-        const hashedPassword = await bcrypt.hash(finalPassword, 10);
-
         const newUser = new User({
             name,
             email,
-            password: hashedPassword,
         });
 
         const savedUser = await newUser.save();
-        const { password: _, ...userWithoutPassword } = savedUser._doc;
-
-        return res.status(201).json(userWithoutPassword);
+        if (!savedUser) {
+            return res.status(500).json({ message: "Failed to register user" });
+        }
+        return res.status(201).json(savedUser);
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: "Something went wrong" });

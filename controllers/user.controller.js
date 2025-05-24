@@ -10,19 +10,19 @@ const registerUser = async (req, res) => {
 
         const existingUser = await User.findOne({ email });
 
-        // 🔹 Google Sign-In: If user exists, return it (no need to save again)
+        // Google Sign-In: If user exists, return it (no need to save again)
         if (provider === "google.com") {
             if (existingUser) {
                 return res.status(200).json(existingUser);
             }
         }
 
-        // 🔹 Email/Password: If user exists, return error
+        // Email/Password: If user exists, return error
         if (provider === "password" && existingUser) {
             return res.status(400).json({ message: "Email already exists" });
         }
 
-        // ✅ Save new user
+        // Save new user
         const newUser = new User({
             name,
             email,

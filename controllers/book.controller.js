@@ -6,8 +6,7 @@ import { deleteImage } from "../utilities/deleteImage.js";
 const addBook = async (req, res) => {
     try {
         const { bookName, authorName, description, price, category } = req.body;
-        console.log(req.body);
-        console.log(req.files);
+
 
         if (!bookName || !authorName || !description || price == null || !category) {
             return res.status(400).json({ message: "All fields are required" });

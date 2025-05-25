@@ -4,6 +4,7 @@ import cors from 'cors'
 import connectDB from "./config/dbConnect.js";
 import userRoute from "./routes/user.route.js";
 import bookRoute from "./routes/book.route.js";
+import categoryRoute from "./routes/category.route.js";
 import Stripe from "stripe";
 import paymentRoute from "./routes/payment.routes.js";
 
@@ -23,6 +24,7 @@ app.use(express.urlencoded({ extended: true }))
 // routes
 app.use('/api/auth', userRoute)
 app.use('/api/book', bookRoute)
+app.use("/api/categories", categoryRoute);
 app.use('/api/payment', paymentRoute)
 
 app.get('/', (req, res) => {

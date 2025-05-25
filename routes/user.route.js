@@ -4,7 +4,9 @@ import {
     getUser,
     getAllUsers,
     updateUser,
-    deleteUser
+    deleteUser,
+    makeAdmin,
+    removeAdmin
 } from '../controllers/user.controller.js';
 
 const userRoute = express.Router();
@@ -14,5 +16,8 @@ userRoute.get('/:id', getUser)
 userRoute.post('/register', registerUser)
 userRoute.put('/:id', updateUser)
 userRoute.delete('/:id', deleteUser)
+userRoute.put("/make-admin/:id", makeAdmin);
+userRoute.put("/remove-admin/:id", removeAdmin);
+
 
 export default userRoute

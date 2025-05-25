@@ -2,7 +2,7 @@ import User from "../models/user.model.js";
 
 const registerUser = async (req, res) => {
     try {
-        const { name, email, provider, uid } = req.body;
+        const { name, email, provider, uid, role } = req.body;
 
         if (!name || !email || !provider || !uid) {
             return res.status(400).json({ message: "All fields are required" });
@@ -28,6 +28,7 @@ const registerUser = async (req, res) => {
             email,
             provider,
             uid,
+            role
         });
 
         const savedUser = await newUser.save();
@@ -42,19 +43,18 @@ const registerUser = async (req, res) => {
 
 const getUser = async (req, res) => {
     try {
-        const userId = req.params.id;
-
-        if (!userId) {
-            return res.status(400).json({ message: "User ID is required" });
+        const uid = req.params.id;
+        console.log(uid)
+        if (!uid) {
+            return res.status(400).json({ message: "UID is required" });
         }
 
-        const user = await User.findById(userId);
+        const user = await User.findOne({ uid });
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        const { password, ...userWithoutPassword } = user._doc;
-        return res.status(200).json(userWithoutPassword);
+        return res.status(200).json(user);
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: "Something went wrong" });

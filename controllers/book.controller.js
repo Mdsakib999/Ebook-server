@@ -5,7 +5,7 @@ import { deleteImage } from "../utilities/deleteImage.js";
 // CREATE
 const addBook = async (req, res) => {
     try {
-        const { bookName, authorName, description, price, category } = req.body;
+        const { bookName, authorName, description, price, category, rating } = req.body;
 
 
         if (!bookName || !authorName || !description || price == null || !category) {
@@ -32,6 +32,7 @@ const addBook = async (req, res) => {
             category,
             image: imageUrl,
             pdf: pdfUrl,
+            rating
         });
 
         const savedBook = await newBook.save();
@@ -106,11 +107,7 @@ const updateBook = async (req, res) => {
             updateFields.image = "";
         }
 
-        // Remove old PDF if flagged
-        if (removePdf === "true" && existingBook.pdfUrl) {
-            await deleteFile(existingBook.pdfUrl); // Your Cloudinary or file system delete helper
-            updateFields.pdfUrl = "";
-        }
+
 
         // Upload new image (cover)
         if (req.files?.cover) {
@@ -121,14 +118,21 @@ const updateBook = async (req, res) => {
             updateFields.image = imageUrl;
         }
 
+        // Remove old PDF if flagged
+        if (removePdf === "true" && existingBook.pdf) {
+            await deleteFile(existingBook.pdf); // Adjust delete logic as needed
+            updateFields.pdf = "";
+        }
+
         // Upload new PDF (book file)
         if (req.files?.pdf) {
-            if (existingBook.pdfUrl) {
-                await deleteFile(existingBook.pdfUrl);
+            if (existingBook.pdf) {
+                await deleteFile(existingBook.pdf);
             }
             const pdfUrl = await uploadToCloudinary(req.files.pdf[0].buffer, "book_pdfs", "raw"); // use resource_type: "raw"
-            updateFields.pdfUrl = pdfUrl;
+            updateFields.pdf = pdfUrl;
         }
+
 
         const updatedBook = await Book.findByIdAndUpdate(id, updateFields, {
             new: true,
@@ -149,7 +153,6 @@ const updateBook = async (req, res) => {
         });
     }
 };
-
 
 // DELETE
 const deleteBook = async (req, res) => {

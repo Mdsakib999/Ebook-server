@@ -43,6 +43,60 @@ const createPaymentIntent = async (req, res) => {
     }
 };
 
+// const saveOrder = async (req, res) => {
+//     try {
+//         const { userId, items, total, currency, paymentIntentId } = req.body;
+//         console.log("items:==>", items)
+
+//         if (!userId || !items || items.length === 0 || !total || !currency || !paymentIntentId) {
+//             return res.status(400).json({ message: "Missing required order details" });
+//         }
+
+//         // Verify PaymentIntent status
+//         const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+//         if (paymentIntent.status !== "succeeded") {
+//             return res.status(400).json({ message: "Payment not completed" });
+//         }
+
+//         // Validate currency
+//         const allowedCurrencies = ["USD", "EUR", "GBP"];
+//         if (!allowedCurrencies.includes(currency.toUpperCase())) {
+//             return res.status(400).json({ message: "Invalid currency" });
+//         }
+
+//         // Save order to database
+//         const order = new Order({
+//             userId,
+//             items: items.map((item) => ({
+//                 book: item?.book,
+//                 bookId: item.bookId,
+//                 bookName: item.bookName,
+//                 authorName: item.authorName,
+//                 price: item.price,
+//                 quantity: item.quantity,
+//             })),
+//             total,
+//             currency: currency.toUpperCase(),
+//             paymentIntentId,
+//             status: "completed",
+//         });
+
+//         const savedOrder = await order.save();
+
+//         // Update user's orders array
+//         await User.findByIdAndUpdate(
+//             userId,
+//             { $push: { orders: savedOrder._id } },
+//             { new: true }
+//         );
+
+//         return res.status(201).json({ message: "Order saved successfully", orderId: savedOrder._id });
+//     } catch (error) {
+//         console.error("Save order error:", error);
+//         return res.status(500).json({ message: "Failed to save order" });
+//     }
+// };
+
 const saveOrder = async (req, res) => {
     try {
         const { userId, items, total, currency, paymentIntentId } = req.body;
@@ -63,22 +117,31 @@ const saveOrder = async (req, res) => {
         if (!allowedCurrencies.includes(currency.toUpperCase())) {
             return res.status(400).json({ message: "Invalid currency" });
         }
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
 
         // Save order to database
         const order = new Order({
             userId,
+            user: {
+                name: user.name,
+                email: user.email,
+            },
             items: items.map((item) => ({
                 book: item?.book,
+                image: item?.image,
                 bookId: item.bookId,
                 bookName: item.bookName,
                 authorName: item.authorName,
+                category: item.category,
                 price: item.price,
                 quantity: item.quantity,
             })),
             total,
             currency: currency.toUpperCase(),
             paymentIntentId,
-            status: "completed",
         });
 
         const savedOrder = await order.save();
@@ -105,7 +168,7 @@ const getOrderHistory = async (req, res) => {
             return res.status(400).json({ message: "User ID is required" });
         }
 
-        const user = await User.findOne(userId).populate("orders").lean();
+        const user = await User.findById(userId).populate("orders").lean();
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
@@ -117,4 +180,13 @@ const getOrderHistory = async (req, res) => {
     }
 };
 
-export { createPaymentIntent, saveOrder, getOrderHistory };
+const getAllorder = async (req, res) => {
+    try {
+        const orders = await Order.find().lean();
+        return res.status(200).json(orders);
+    } catch (error) {
+        console.error("Get order history error:", error);
+        return res.status(500).json({ message: "Failed to retrieve order history" });
+    }
+};
+export { createPaymentIntent, saveOrder, getOrderHistory, getAllorder };

@@ -6,13 +6,19 @@ const orderSchema = new mongoose.Schema({
         ref: "User",
         required: true,
     },
+    user: {
+        name: String,
+        email: String,
+    },
     items: [
         {
             book: { type: String, required: true },
+            image: { type: String, required: true },
             bookId: { type: String, required: true },
             bookName: { type: String, required: true },
             authorName: { type: String, required: true },
             price: { type: Number, required: true },
+            category: { type: String, required: true },
             quantity: { type: Number, required: true, default: 1 },
         },
     ],

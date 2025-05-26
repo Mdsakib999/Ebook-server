@@ -34,6 +34,7 @@ const addBook = async (req, res) => {
             rating,
             image: imageUrl,
             pdf: pdfUrl,
+            rating
         });
 
         const savedBook = await newBook.save();
@@ -152,7 +153,6 @@ const updateBook = async (req, res) => {
         });
     }
 };
-
 
 // DELETE
 const deleteBook = async (req, res) => {

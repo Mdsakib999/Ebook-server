@@ -43,7 +43,6 @@ const registerUser = async (req, res) => {
 const getUser = async (req, res) => {
     try {
         const uid = req.params.id;
-
         if (!uid) {
             return res.status(400).json({ message: "UID is required" });
         }
@@ -113,11 +112,69 @@ const getAllUsers = async (req, res) => {
         return res.status(500).json({ message: "Something went wrong" });
     }
 };
+const makeAdmin = async (req, res) => {
+    try {
+        const userId = req.params.id;
+
+        if (!userId) {
+            return res.status(400).json({ message: "User ID is required" });
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { role: "admin" },
+            { new: true }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        return res.status(200).json({
+            message: "User promoted to admin successfully",
+            user: updatedUser,
+        });
+    } catch (error) {
+        console.error("Error promoting user to admin:", error);
+        return res.status(500).json({ message: "Something went wrong" });
+    }
+};
+const removeAdmin = async (req, res) => {
+    try {
+        const userId = req.params.id;
+
+        if (!userId) {
+            return res.status(400).json({ message: "User ID is required" });
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { role: "user" }, // Set back to regular user
+            { new: true }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        return res.status(200).json({
+            message: "Admin role removed successfully",
+            user: updatedUser,
+        });
+    } catch (error) {
+        console.error("Error removing admin role:", error);
+        return res.status(500).json({ message: "Something went wrong" });
+    }
+};
+
+
 
 export {
     registerUser,
     getUser,
     updateUser,
     deleteUser,
-    getAllUsers
+    getAllUsers,
+    makeAdmin,
+    removeAdmin
 };

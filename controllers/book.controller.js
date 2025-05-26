@@ -1,5 +1,6 @@
 import { uploadToCloudinary } from "../config/cloudinary.js";
 import Book from "../models/book.model.js";
+import { deleteFile } from "../utilities/deleteFile.js";
 import { deleteImage } from "../utilities/deleteImage.js";
 
 // CREATE
@@ -30,6 +31,7 @@ const addBook = async (req, res) => {
             description,
             price,
             category,
+            rating,
             image: imageUrl,
             pdf: pdfUrl,
             rating
@@ -106,8 +108,6 @@ const updateBook = async (req, res) => {
             await deleteImage(existingBook.image);
             updateFields.image = "";
         }
-
-
 
         // Upload new image (cover)
         if (req.files?.cover) {

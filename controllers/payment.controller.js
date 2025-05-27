@@ -63,10 +63,18 @@ const saveOrder = async (req, res) => {
         if (!allowedCurrencies.includes(currency.toUpperCase())) {
             return res.status(400).json({ message: "Invalid currency" });
         }
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
 
         // Save order to database
         const order = new Order({
             userId,
+            user: {
+                name: user.name,
+                email: user.email,
+            },
             items: items.map((item) => ({
                 book: item?.book,
                 bookId: item.bookId,
@@ -116,5 +124,14 @@ const getOrderHistory = async (req, res) => {
         return res.status(500).json({ message: "Failed to retrieve order history" });
     }
 };
+const getAllorder = async (req, res) => {
+    try {
+        const orders = await Order.find().lean();
+        return res.status(200).json(orders);
+    } catch (error) {
+        console.error("Get order history error:", error);
+        return res.status(500).json({ message: "Failed to retrieve order history" });
+    }
+};
 
-export { createPaymentIntent, saveOrder, getOrderHistory };
+export { createPaymentIntent, saveOrder, getOrderHistory, getAllorder };

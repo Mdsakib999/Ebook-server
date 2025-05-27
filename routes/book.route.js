@@ -3,7 +3,7 @@ import { uploadMultiple } from "../config/multer.js";
 import {
     addBook,
     getAllBooks,
-    getBookById,
+    getBookByTitle,
     updateBook,
     deleteBook
 } from '../controllers/book.controller.js';
@@ -12,7 +12,7 @@ const bookRoute = express.Router();
 
 bookRoute.get('/allbooks', getAllBooks)
 
-bookRoute.get('/:id', getBookById)
+bookRoute.get('/:title', getBookByTitle)
 
 bookRoute.post('/add-books', uploadMultiple, addBook);
 

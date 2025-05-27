@@ -58,21 +58,23 @@ const getAllBooks = async (req, res) => {
 };
 
 // READ ONE
-const getBookById = async (req, res) => {
+const getBookByTitle = async (req, res) => {
     try {
-        const { id } = req.params;
+        let { title } = req.params;
+        title = title.replace(/-/g, ' ');
 
-        const book = await Book.findById(id);
+        const book = await Book.findOne({ bookName: title });
         if (!book) {
             return res.status(404).json({ message: "Book not found" });
         }
 
         return res.status(200).json(book);
     } catch (error) {
-        console.error("Get Book By ID Error:", error);
+        console.error("Get Book By Title Error:", error);
         return res.status(500).json({ message: "Internal Server Error" });
     }
 };
+
 
 // UPDATE
 const updateBook = async (req, res) => {
@@ -174,7 +176,7 @@ const deleteBook = async (req, res) => {
 export {
     addBook,
     getAllBooks,
-    getBookById,
+    getBookByTitle,
     updateBook,
     deleteBook
 };

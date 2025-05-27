@@ -179,7 +179,6 @@ const getOrderHistory = async (req, res) => {
         return res.status(500).json({ message: "Failed to retrieve order history" });
     }
 };
-
 const getAllorder = async (req, res) => {
     try {
         const orders = await Order.find().lean();
@@ -189,4 +188,5 @@ const getAllorder = async (req, res) => {
         return res.status(500).json({ message: "Failed to retrieve order history" });
     }
 };
+
 export { createPaymentIntent, saveOrder, getOrderHistory, getAllorder };

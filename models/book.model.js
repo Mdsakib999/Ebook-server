@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 
 const bookSchema = new mongoose.Schema({
-    bookName: { type: String, required: true },
-    authorName: { type: String, required: true },
+    bookName: { type: String, required: true, trim: true, lowercase: true },
+    authorName: { type: String, required: true, trim: true, lowercase: true },
     description: { type: String, required: true },
     price: { type: Number, required: true },
     discountPrice: { type: Number },
@@ -11,7 +11,12 @@ const bookSchema = new mongoose.Schema({
     category: { type: String, required: true },
     pdf: { type: String, required: true },
 
-}, { timestamps: true })
+}, { timestamps: true });
+// ✅ Prevent duplicate book by same author
+bookSchema.index(
+    { bookName: 1, authorName: 1 },
+    { unique: true }
+);
 
 const Book = mongoose.model("Book", bookSchema)
 

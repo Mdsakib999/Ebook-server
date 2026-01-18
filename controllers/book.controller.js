@@ -58,18 +58,19 @@ const getAllBooks = async (req, res) => {
 };
 
 // READ ONE
-const getBookByTitle = async (req, res) => {
+const getBookBySlug = async (req, res) => {
     try {
-        const { title } = req.params;
-        
-        const book = await Book.findOne({ bookName: title.toLowerCase() });
+        let { slug } = req.params;
+        slug = decodeURIComponent(slug || "");
+        const bookName = slug.replace(/-/g, " ").replace(/\s+/g, " ").trim().toLowerCase();
+        const book = await Book.findOne({ bookName });
         if (!book) {
             return res.status(404).json({ message: "Book not found" });
         }
 
         return res.status(200).json(book);
     } catch (error) {
-        console.error("Get Book By Title Error:", error);
+        console.error("Get Book By Slug Error:", error);
         return res.status(500).json({ message: "Internal Server Error" });
     }
 };
@@ -173,9 +174,8 @@ const deleteBook = async (req, res) => {
 };
 
 export {
-    addBook,
-    getAllBooks,
-    getBookByTitle,
-    updateBook,
-    deleteBook
+    addBook, deleteBook, getAllBooks,
+    getBookBySlug,
+    updateBook
 };
+

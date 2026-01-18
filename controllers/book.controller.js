@@ -60,10 +60,9 @@ const getAllBooks = async (req, res) => {
 // READ ONE
 const getBookByTitle = async (req, res) => {
     try {
-        let { title } = req.params;
-        title = title.replace(/-/g, ' ');
-
-        const book = await Book.findOne({ bookName: title });
+        const { title } = req.params;
+        
+        const book = await Book.findOne({ bookName: title.toLowerCase() });
         if (!book) {
             return res.status(404).json({ message: "Book not found" });
         }

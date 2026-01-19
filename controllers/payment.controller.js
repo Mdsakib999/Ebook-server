@@ -7,7 +7,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const createPaymentIntent = async (req, res) => {
     try {
         const { items, currency, userId } = req.body;
-        console.log("items, currency, userId =>", items, currency, userId);
+        // console.log("items, currency, userId =>", items, currency, userId);
 
         if (!items || items.length === 0) {
             return res.status(400).json({ message: "No items provided for payment" });

@@ -61,9 +61,8 @@ const getAllBooks = async (req, res) => {
 const getBookBySlug = async (req, res) => {
     try {
         let { slug } = req.params;
-        slug = decodeURIComponent(slug || "");
-        const bookName = slug.replace(/-/g, " ").replace(/\s+/g, " ").trim().toLowerCase();
-        const book = await Book.findOne({ bookName });
+        console.log(slug);
+        const book = await Book.findOne({ slug });
         if (!book) {
             return res.status(404).json({ message: "Book not found" });
         }

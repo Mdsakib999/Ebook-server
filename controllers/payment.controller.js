@@ -100,7 +100,7 @@ const createPaymentIntent = async (req, res) => {
 const saveOrder = async (req, res) => {
     try {
         const { userId, items, total, currency, paymentIntentId } = req.body;
-        console.log("items:==>", items)
+        console.log("items:==>", items);
 
         if (!userId || !items || items.length === 0 || !total || !currency || !paymentIntentId) {
             return res.status(400).json({ message: "Missing required order details" });
